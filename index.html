@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- STREAMING_CHUNK: Injecting Android-responsive viewport configurations and layout headers... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>BloomPlanner by Sumit Biswas</title>
+    
+    <!-- Progressive Web App (PWA) Manifest Links -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f43f5e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/f43f5e/ffffff?text=Bloom">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti for Celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        bloom: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            dark: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- STREAMING_CHUNK: Declaring Android-native system scrollbars and tap highlight resets... -->
+    <style>
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .overflow-y-auto {
+            -webkit-overflow-scrolling: touch;
+        }
+        .bounce-hover:hover {
+            transform: translateY(-2px);
+        }
+        .bounce-click:active {
+            transform: scale(0.96);
+        }
+        .task-checkbox:checked + span {
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom highlight overlay for spotlight */
+        .tour-highlight {
+            position: relative !important;
+            z-index: 50 !important;
+            box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.75) !important;
+            pointer-events: none !important;
+            border-radius: 16px !important;
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen flex flex-col antialiased select-none no-select">
+
+<!-- STREAMING_CHUNK: Designing a luxury Android splash screen with slow rotating quotes... -->
+<!-- Splash Loading Screen by Sumit with Wisdom Tips -->
+<div id="loadingOverlay" class="fixed inset-0 bg-gradient-to-tr from-rose-50 via-white to-pink-50 z-50 flex flex-col items-center justify-center transition-all duration-700">
+    <div class="relative flex items-center justify-center">
+        <!-- Floating emojis background -->
+        <div class="animate-bounce text-6xl mb-4">🌸</div>
+        <div class="absolute -top-6 -left-6 animate-pulse text-2xl">✨</div>
+        <div class="absolute -bottom-6 -right-6 animate-ping text-2xl">🌱</div>
+    </div>
+    
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-4 bg-gradient-to-r from-pink-500 via-rose-500 to-indigo-600 bg-clip-text text-transparent">BloomPlanner</h1>
+    <p class="text-indigo-500 font-black text-xs uppercase tracking-widest mt-1">Sumit is setting things up for you...</p>
+    
+    <!-- Rotating Quote tip -->
+    <div class="max-w-xs text-center mt-6 min-h-[56px] px-4 flex items-center justify-center">
+        <p id="loadingTip" class="text-xs font-bold text-slate-500 italic transition-all duration-500">"Sumit says: Consistency always beats intensity."</p>
+    </div>
+
+    <!-- Simple dynamic loading indicator -->
+    <div class="w-48 h-2 bg-slate-100 rounded-full mt-4 overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-rose-400 to-pink-500 rounded-full animate-infinite animate-pulse w-3/4"></div>
+    </div>
+    
+    <div class="absolute bottom-10 text-center">
+        <p class="text-slate-400 text-[10px] font-black tracking-widest uppercase">CREATOR PLATFORM</p>
+        <p class="text-slate-600 font-extrabold text-sm flex items-center justify-center gap-1.5 mt-0.5">
+            <span>✨</span> Made by Sumit Biswas
+        </p>
+    </div>
+</div>
+
+<!-- STREAMING_CHUNK: Constructing the beautiful Android-responsive multi-step onboarding card... -->
+<!-- Stepped Onboarding Modal Screen for First-Time Launch -->
+<div id="onboardingModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-md z-40 hidden flex-col items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl p-6 sm:p-8 transform scale-95 transition-transform duration-300 relative overflow-hidden flex flex-col max-h-[92vh] overflow-y-auto">
+        
+        <!-- Step Indicator Top Bar -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-1.5">
+                <span class="text-xl">🌸</span>
+                <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Sumit Biswas Configurator</span>
+            </div>
+            <span id="onboardingProgressLabel" class="bg-rose-50 text-rose-500 text-[10px] font-black px-2.5 py-1 rounded-full">Step 1 of 4</span>
+        </div>
+
+        <div class="w-full bg-slate-100 h-1.5 rounded-full mb-6 overflow-hidden">
+            <div id="onboardingProgressBar" class="bg-rose-500 h-full w-1/4 transition-all duration-300"></div>
+        </div>
+
+        <!-- SCENE 1: Welcome Intro -->
+        <div id="obScene-1" class="space-y-4 py-2 transition-all duration-300">
+            <h2 class="text-2xl font-black text-slate-800 leading-tight">
+                Sumit wants to know some of your details!
+            </h2>
+            <p class="text-slate-500 text-sm leading-relaxed">
+                Welcome to BloomPlanner! Before you begin, creator **Sumit Biswas** has designed a short questionnaire. 
+                This will align your hourly task slots and goals with your real-world needs.
+            </p>
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center gap-3">
+                <span class="text-2xl">🌱</span>
+                <p class="text-xs font-bold text-slate-600">Your details are saved entirely in your local, private device workspace.</p>
+            </div>
+            <button onclick="nextOnboardingStep()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-sm py-4 rounded-2xl shadow-lg shadow-rose-500/20 transition-all bounce-hover bounce-click mt-4">
+                Let's Customize <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+        </div>
+
+        <!-- SCENE 2: Gender Selection -->
+        <div id="obScene-2" class="space-y-4 py-2 hidden transition-all duration-300">
+            <h2 class="text-xl sm:text-2xl font-black text-slate-800 leading-tight">
+                Select your Gender ⚡
+            </h2>
+            <p class="text-slate-500 text-xs">Help Mr. Biswas customize your personal profile display.</p>
+            <div class="grid grid-cols-3 gap-3 pt-2">
+                <label onclick="saveGenderSelection('Male')" class="border-2 border-slate-100 hover:border-rose-400 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all bg-slate-50/50 hover:bg-rose-50/20 active:scale-95">
+                    <span class="text-3xl mb-1">👨</span>
+                    <span class="text-xs font-bold text-slate-600">Male</span>
+                </label>
+                <label onclick="saveGenderSelection('Female')" class="border-2 border-slate-100 hover:border-rose-400 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all bg-slate-50/50 hover:bg-rose-50/20 active:scale-95">
+                    <span class="text-3xl mb-1">👩</span>
+                    <span class="text-xs font-bold text-slate-600">Female</span>
+                </label>
+                <label onclick="saveGenderSelection('Other')" class="border-2 border-slate-100 hover:border-rose-400 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all bg-slate-50/50 hover:bg-rose-50/20 active:scale-95">
+                    <span class="text-3xl mb-1">✨</span>
+                    <span class="text-xs font-bold text-slate-600">Other</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- SCENE 3: Profession Selection -->
+        <div id="obScene-3" class="space-y-4 py-2 hidden transition-all duration-300">
+            <h2 class="text-xl sm:text-2xl font-black text-slate-800 leading-tight">
+                Select your Profession 💼
+            </h2>
+            <p class="text-slate-500 text-xs">This shapes your primary workspace taxonomy.</p>
+            <div class="grid grid-cols-2 gap-2.5 pt-2">
+                <div onclick="saveProfessionSelection('Student')" class="border border-slate-200 hover:border-indigo-400 rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-indigo-50/20 transition-all active:scale-95">
+                    <span class="text-lg">📚</span>
+                    <span class="text-xs font-bold text-slate-600">Student</span>
+                </div>
+                <div onclick="saveProfessionSelection('Developer')" class="border border-slate-200 hover:border-indigo-400 rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-indigo-50/20 transition-all active:scale-95">
+                    <span class="text-lg">💻</span>
+                    <span class="text-xs font-bold text-slate-600">Developer</span>
+                </div>
+                <div onclick="saveProfessionSelection('Creative')" class="border border-slate-200 hover:border-indigo-400 rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-indigo-50/20 transition-all active:scale-95">
+                    <span class="text-lg">🎨</span>
+                    <span class="text-xs font-bold text-slate-600">Creative</span>
+                </div>
+                <div onclick="saveProfessionSelection('Business')" class="border border-slate-200 hover:border-indigo-400 rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-indigo-50/20 transition-all active:scale-95">
+                    <span class="text-lg">📈</span>
+                    <span class="text-xs font-bold text-slate-600">Founder</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCENE 4: Goals Selection -->
+        <div id="obScene-4" class="space-y-4 py-2 hidden transition-all duration-300">
+            <h2 class="text-xl sm:text-2xl font-black text-slate-800 leading-tight">
+                Your Primary Goal 🎯
+            </h2>
+            <p class="text-slate-500 text-xs">Mr. Biswas's alerts will help you prioritize this category.</p>
+            <div class="grid grid-cols-1 gap-2 pt-2">
+                <div onclick="saveGoalSelection('Career')" class="border border-slate-200 hover:border-rose-400 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:bg-rose-50/20 transition-all active:scale-95">
+                    <span class="text-lg">💼</span>
+                    <div>
+                        <p class="text-xs font-extrabold text-slate-700">Advance Career</p>
+                        <p class="text-[10px] text-slate-400">Scale professional tasks & deadlines</p>
+                    </div>
+                </div>
+                <div onclick="saveGoalSelection('Health')" class="border border-slate-200 hover:border-rose-400 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:bg-rose-50/20 transition-all active:scale-95">
+                    <span class="text-lg">💪</span>
+                    <div>
+                        <p class="text-xs font-extrabold text-slate-700">Cultivate Healthy Life</p>
+                        <p class="text-[10px] text-slate-400">Master workouts and physical goals</p>
+                    </div>
+                </div>
+                <div onclick="saveGoalSelection('Finance')" class="border border-slate-200 hover:border-rose-400 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:bg-rose-50/20 transition-all active:scale-95">
+                    <span class="text-lg">💰</span>
+                    <div>
+                        <p class="text-xs font-extrabold text-slate-700">Financial Independence</p>
+                        <p class="text-[10px] text-slate-400">Organize budgets and study money</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- STREAMING_CHUNK: Designing the spotlight overlay container... -->
+<!-- Dynamic Tour Spotlight Guide Box -->
+<div id="tourTooltipCard" class="absolute z-50 bg-slate-900 text-white rounded-2xl p-5 shadow-2xl max-w-[290px] hidden flex-col transition-all duration-300">
+    <div class="flex items-start gap-2.5">
+        <span class="text-2xl">👨‍🏫</span>
+        <div>
+            <h4 id="tourTooltipTitle" class="text-xs font-black tracking-wider uppercase text-rose-400">Tour Indicator</h4>
+            <p id="tourTooltipText" class="text-xs font-medium text-slate-200 mt-1 leading-relaxed">Explanation text goes here...</p>
+        </div>
+    </div>
+    <div class="flex justify-between items-center mt-4 pt-2 border-t border-slate-800">
+        <button onclick="skipTutorial()" class="text-[10px] font-bold text-slate-400 hover:text-white uppercase">Skip Tour</button>
+        <button onclick="nextTutorialStep()" class="bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-[10px] px-3 py-1.5 rounded-lg transition-all bounce-click">
+            Next step <i class="fa-solid fa-chevron-right text-[8px] ml-1"></i>
+        </button>
+    </div>
+</div>
+
+<!-- STREAMING_CHUNK: Creating layout structure optimized for Android devices... -->
+<!-- Main Application Layout with Dynamic Safe Space Area Padding for Mobile Notch devices -->
+<div class="flex-1 flex flex-col md:flex-row max-w-7xl w-full mx-auto p-3 sm:p-4 md:p-6 gap-6 pt-[safe] pb-[safe]">
+    
+    <!-- Sidebar / Left Navigation Panel -->
+    <aside class="w-full md:w-80 shrink-0 flex flex-col gap-4">
+        <!-- App Identity -->
+        <div class="bg-gradient-to-br from-rose-500 to-pink-600 text-white p-5 rounded-3xl shadow-xl shadow-rose-500/10 relative overflow-hidden flex flex-col justify-between min-h-[140px]">
+            <div class="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 w-36 h-36 bg-white/10 rounded-full blur-2xl"></div>
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-1.5">
+                        <span>🌸</span> BloomPlanner
+                    </h1>
+                    <p class="text-[9px] text-rose-100 font-black tracking-widest uppercase">Sumit Biswas Edition</p>
+                </div>
+                <span id="cloudStatus" class="bg-white/20 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-md">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Syncing
+                </span>
+            </div>
+            
+            <!-- Day Mini-Briefing -->
+            <div class="mt-4 pt-4 border-t border-white/20 flex justify-between items-center">
+                <div>
+                    <p id="navDate" class="text-sm font-bold">Loading Date...</p>
+                    <p id="navDay" class="text-xs text-rose-100 font-semibold uppercase tracking-wider">Today</p>
+                </div>
+                <div class="bg-white/10 rounded-2xl p-2 text-center backdrop-blur-sm min-w-[50px]">
+                    <div id="todayProgressPercent" class="text-lg font-black leading-none">0%</div>
+                    <div class="text-[9px] font-bold text-rose-200 mt-1">Done</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Sidebar Stats & 15-Min Notification Tester -->
+        <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex flex-col gap-2">
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Active Target Alarms
+            </span>
+            <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
+                <div>
+                    <p class="text-xs font-bold text-slate-700">Automatic Scheduler</p>
+                    <p class="text-[9px] text-slate-400 font-medium">Triggers checking every 15 mins</p>
+                </div>
+                <button id="testAlarmBtn" onclick="triggerImmediateAlarm()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold text-[10px] px-2.5 py-1.5 rounded-xl transition-all bounce-hover">
+                    Test Alarm
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs - scrollable row on mobile, column on desktop -->
+        <div id="tabSelectionBox" class="bg-white p-2 rounded-3xl shadow-sm border border-slate-100 flex md:flex-col gap-1.5 overflow-x-auto scrollbar-none shrink-0">
+            <button onclick="switchTab('today')" id="tabBtn-today" class="tab-btn flex-1 md:flex-initial flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 bg-rose-500 text-white shadow-md shadow-rose-500/10 whitespace-nowrap">
+                <i class="fa-solid fa-clock-retro text-lg"></i>
+                <span>Today's Hours</span>
+            </button>
+            <button onclick="switchTab('week')" id="tabBtn-week" class="tab-btn flex-1 md:flex-initial flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 text-slate-600 hover:bg-slate-50 whitespace-nowrap">
+                <i class="fa-solid fa-calendar-week text-lg text-indigo-500"></i>
+                <span>Week Board</span>
+            </button>
+            <button onclick="switchTab('month')" id="tabBtn-month" class="tab-btn flex-1 md:flex-initial flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 text-slate-600 hover:bg-slate-50 whitespace-nowrap">
+                <i class="fa-solid fa-calendar-days text-lg text-emerald-500"></i>
+                <span>Month Board</span>
+            </button>
+            <button onclick="switchTab('stats')" id="tabBtn-stats" class="tab-btn flex-1 md:flex-initial flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 text-slate-600 hover:bg-slate-50 whitespace-nowrap">
+                <i class="fa-solid fa-chart-line text-lg text-violet-500"></i>
+                <span>My Progress</span>
+            </button>
+        </div>
+
+        <!-- Streak Panel & Achievements Card -->
+        <div id="streakCountBox" class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex-1 hidden md:flex flex-col justify-between">
+            <div>
+                <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                    <span>🔥</span> Streak Master
+                </h3>
+                <div class="flex items-center gap-4 mt-3 bg-gradient-to-r from-amber-50 to-orange-50 p-3 rounded-2xl border border-amber-100">
+                    <span class="text-3xl">🔥</span>
+                    <div>
+                        <div id="streakCount" class="text-xl font-extrabold text-amber-600">0 Days</div>
+                        <p class="text-[11px] text-slate-500 font-medium">Keep completing targets daily!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-sm font-bold text-slate-700">Badges Unlocked</h3>
+                    <span id="badgeCount" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">0/4</span>
+                </div>
+                <div class="grid grid-cols-4 gap-2 mt-2" id="badgesGrid">
+                    <!-- Badges render here dynamically -->
+                </div>
+            </div>
+
+            <!-- Profile Info with Cloud User ID -->
+            <div class="pt-4 border-t border-slate-100 mt-6 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-pink-400 to-indigo-500 flex items-center justify-center text-white font-black text-sm" id="avatarLetter">
+                    S
+                </div>
+                <div class="overflow-hidden flex-1">
+                    <p class="text-xs font-bold text-slate-800 truncate" id="userDisplayLabel">Securing Workspace...</p>
+                    <button onclick="copyUserId()" class="text-[10px] text-indigo-500 font-semibold hover:underline block truncate" title="Click to copy Auth ID">
+                        Copy Sync Key <i class="fa-regular fa-copy ml-0.5"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Global Tiny Creator branding footer -->
+            <div class="pt-3 border-t border-slate-100/50 mt-4 text-center">
+                <p class="text-[10px] font-bold text-slate-400">Sumit Biswas's Workspace Protocol</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- STREAMING_CHUNK: Setting up core sections and dynamic calendar grids... -->
+    <!-- Main Content Panel -->
+    <main class="flex-1 flex flex-col gap-4 min-w-0">
+        
+        <!-- Tab 1: Today's Hour-by-Hour View -->
+        <section id="tab-today" class="tab-content flex-1 flex flex-col gap-4">
+            <!-- Header controls -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-100">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                        <span>⚡</span> Today's Targets
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Focus on hourly commitments and complete them step-by-step.</p>
+                </div>
+                <div class="flex items-center gap-2 self-end sm:self-auto">
+                    <button onclick="startTutorialGuide()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-extrabold px-3 py-2.5 rounded-2xl flex items-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-graduation-cap text-sm"></i> Learn from Mr. Biswas
+                    </button>
+                    <input type="date" id="todayDateSelector" onchange="changeActiveDate(this.value)" class="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-sm px-3.5 py-2.5 rounded-2xl border-none outline-none ring-1 ring-slate-200/80 focus:ring-rose-500/50 cursor-pointer">
+                    <button id="addTargetBtn" onclick="openAddTaskModal()" class="bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-sm px-4 py-2.5 rounded-2xl shadow-md shadow-rose-500/10 flex items-center gap-2 bounce-hover bounce-click">
+                        <i class="fa-solid fa-plus"></i> Add Target
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Bar (Visual mini graph) -->
+            <div id="statsSummaryBar" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-lg"><i class="fa-solid fa-list-check"></i></div>
+                    <div>
+                        <div id="statTotal" class="text-lg font-extrabold text-slate-800">0</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Goals</div>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-lg"><i class="fa-solid fa-circle-check"></i></div>
+                    <div>
+                        <div id="statDone" class="text-lg font-extrabold text-slate-800">0</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Completed</div>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center text-lg"><i class="fa-solid fa-hourglass-half"></i></div>
+                    <div>
+                        <div id="statPending" class="text-lg font-extrabold text-slate-800">0</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pending</div>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-sky-50 text-sky-500 flex items-center justify-center text-lg"><i class="fa-solid fa-fire"></i></div>
+                    <div>
+                        <div id="statProgress" class="text-lg font-extrabold text-slate-800">0%</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Success</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hour-by-Hour Timeline List -->
+            <div id="timelineCardElement" class="bg-white rounded-3xl border border-slate-100 shadow-sm p-4 sm:p-6 flex-1 flex flex-col min-h-[350px]">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                    <h3 class="font-extrabold text-slate-800 flex items-center gap-2">
+                        <span>🕒</span> Day Timeline
+                    </h3>
+                    <span class="text-[10px] text-rose-500 font-extrabold bg-rose-50 px-2 py-0.5 rounded-full tracking-wider">Engineered by Sumit</span>
+                </div>
+
+                <div class="space-y-3 flex-1 overflow-y-auto max-h-[500px] pr-1" id="timelineList">
+                    <!-- Dynamic timeline slots render here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 2: Week Planner -->
+        <section id="tab-week" class="tab-content hidden flex-1 flex flex-col gap-4">
+            <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                        <span>🗓️</span> Weekly Target Board
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Check out your upcoming layout of the week. Perfect for managing mid-term targets.</p>
+                </div>
+                <p class="text-[9px] font-black text-slate-400 border border-slate-200 px-3 py-1.5 rounded-full uppercase">Sumit Biswas Layout</p>
+            </div>
+
+            <!-- Scrollable board grid for small devices, beautiful table for desktop -->
+            <div class="grid grid-cols-1 md:grid-cols-7 gap-3 flex-1 overflow-y-auto max-h-[600px] md:max-h-none md:overflow-visible" id="weeklyBoardGrid">
+                <!-- 7 days of the week columns will render here dynamically -->
+            </div>
+        </section>
+
+        <!-- Tab 3: Month Calendar View -->
+        <section id="tab-month" class="tab-content hidden flex-1 flex flex-col gap-4">
+            <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                        <span>📅</span> Month Overview
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Pick a date to instantly plant schedules or monitor targets.</p>
+                </div>
+                <!-- Month Selection Controls -->
+                <div class="flex items-center gap-2 self-start sm:self-auto bg-slate-50 p-1.5 rounded-2xl">
+                    <button onclick="shiftMonth(-1)" class="w-9 h-9 rounded-xl hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
+                    <span id="calendarMonthLabel" class="text-sm font-extrabold text-slate-800 min-w-[120px] text-center">July 2026</span>
+                    <button onclick="shiftMonth(1)" class="w-9 h-9 rounded-xl hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Calendar Container -->
+            <div class="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-slate-100 flex-1 flex flex-col overflow-x-auto">
+                <div class="min-w-[280px] flex-1 flex flex-col">
+                    <div class="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1 sm:gap-2 flex-1 auto-rows-fr" id="calendarDaysGrid">
+                        <!-- Days dynamically computed and loaded -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 4: My Progress & Stats -->
+        <section id="tab-stats" class="tab-content hidden flex-1 flex flex-col gap-4">
+            <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                        <span>📈</span> Growth & Progress
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Reflect on your achievements and analyze execution rates.</p>
+                </div>
+                <span class="text-[10px] font-black text-rose-500 bg-rose-50 px-3 py-1.5 rounded-full uppercase tracking-wider">Coach: Mr. Biswas</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Circle Progress Chart -->
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
+                    <h3 class="text-sm font-bold text-slate-500 mb-4 uppercase tracking-wider">All-Time Rate</h3>
+                    <div class="relative w-36 h-36 flex items-center justify-center">
+                        <!-- Simple SVG Circle Progress -->
+                        <svg class="w-full h-full transform -rotate-90">
+                            <circle cx="72" cy="72" r="60" stroke="#f1f5f9" stroke-width="12" fill="transparent"></circle>
+                            <circle id="allTimeCircle" cx="72" cy="72" r="60" stroke="#f43f5e" stroke-width="12" fill="transparent" stroke-dasharray="377" stroke-dashoffset="377" stroke-linecap="round" class="transition-all duration-1000"></circle>
+                        </svg>
+                        <div class="absolute text-center">
+                            <div id="allTimePercent" class="text-3xl font-black text-slate-800">0%</div>
+                            <div class="text-[10px] text-slate-400 font-semibold uppercase">Completed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Analytics Breakdown -->
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm lg:col-span-2 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-700 mb-4">Focus Categories Execution</h3>
+                        <div class="space-y-3" id="categoryStatsContainer">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-slate-100 mt-4 flex justify-between items-center text-xs text-slate-400">
+                        <span>Total Registered Tasks: <strong class="text-slate-700" id="statAllTimeTotal">0</strong></span>
+                        <span>Completed Tasks: <strong class="text-emerald-500" id="statAllTimeCompleted">0</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Target Completion Heatmap-like Grid -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex-1">
+                <h3 class="font-extrabold text-slate-800 flex items-center gap-2 mb-2">
+                    <span>✨</span> Activity & Dedication Chart
+                </h3>
+                <p class="text-xs text-slate-400 mb-4">Each square shows task completion patterns over the last 30 days.</p>
+                <div class="flex flex-wrap gap-1.5" id="heatmapGrid">
+                    <!-- Heatmap populated dynamically -->
+                </div>
+                <div class="flex flex-wrap items-center gap-3 mt-4 text-[10px] font-bold text-slate-400">
+                    <span>Less Completed</span>
+                    <div class="flex gap-1">
+                        <div class="w-3.5 h-3.5 rounded-md bg-slate-100"></div>
+                        <div class="w-3.5 h-3.5 rounded-md bg-rose-200"></div>
+                        <div class="w-3.5 h-3.5 rounded-md bg-rose-400"></div>
+                        <div class="w-3.5 h-3.5 rounded-md bg-rose-600"></div>
+                    </div>
+                    <span>Highly Active</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- Add/Edit Target Modal -->
+<div id="taskModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 transition-all duration-300">
+    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col font-sans">
+        <!-- Modal Header -->
+        <div class="p-5 border-b border-slate-100 bg-rose-50/50 flex justify-between items-center">
+            <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
+                <span id="modalIcon">🌸</span> <span id="modalTitle">New Target Details</span>
+            </h3>
+            <button onclick="closeTaskModal()" class="w-8 h-8 rounded-full hover:bg-rose-100/80 flex items-center justify-center text-slate-500 hover:text-rose-600 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Modal Form Body -->
+        <form id="taskForm" onsubmit="saveTaskForm(event)" class="p-5 sm:p-6 space-y-4">
+            <input type="hidden" id="editTaskId">
+            
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">What is your Target? *</label>
+                <input type="text" id="taskTitle" required placeholder="e.g. Morning gym routine, client meeting..." class="w-full bg-slate-50 border border-slate-200/80 focus:border-rose-300 text-slate-800 font-medium text-sm px-4 py-3 rounded-2xl outline-none transition-colors">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Description (Optional)</label>
+                <textarea id="taskDesc" rows="2" placeholder="Add extra steps, links or ideas..." class="w-full bg-slate-50 border border-slate-200/80 focus:border-rose-300 text-slate-800 font-medium text-sm px-4 py-3 rounded-2xl outline-none transition-colors resize-none"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Target Date *</label>
+                    <input type="date" id="taskDate" required class="w-full bg-slate-50 border border-slate-200/80 focus:border-rose-300 text-slate-800 font-medium text-sm px-4 py-3 rounded-2xl outline-none transition-colors cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Category</label>
+                    <select id="taskCategory" class="w-full bg-slate-50 border border-slate-200/80 focus:border-rose-300 text-slate-800 font-medium text-sm px-4 py-3 rounded-2xl outline-none transition-colors cursor-pointer">
+                        <option value="Personal">🌸 Personal</option>
+                        <option value="Work">💼 Work / Duty</option>
+                        <option value="Study">📚 Study / Research</option>
+                        <option value="Health">💪 Fitness / Health</option>
+                        <option value="Finance">💰 Money / Finance</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Hourly Scheduling Toggle -->
+            <div class="bg-slate-50 p-4 rounded-2xl">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Set Exact Time Slot?</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="hasTimeToggle" onchange="toggleTimeFields()" class="sr-only peer">
+                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500"></div>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 hidden" id="timeFieldsContainer">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Start Time</label>
+                        <input type="time" id="taskStartTime" class="w-full bg-white border border-slate-200/80 focus:border-rose-300 text-slate-800 font-medium text-xs px-3 py-2.5 rounded-xl outline-none transition-colors cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">End Time</label>
+                        <input type="time" id="taskEndTime" class="w-full bg-white border border-slate-200/80 focus:border-rose-300 text-slate-800 font-medium text-xs px-3 py-2.5 rounded-xl outline-none transition-colors cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="closeTaskModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm px-4 py-3 rounded-2xl transition-colors">Cancel</button>
+                <button type="submit" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-sm px-4 py-3 rounded-2xl shadow-lg shadow-rose-500/10 transition-colors">Save Target</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Custom Toast Modal Notifications -->
+<div id="toastNotification" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 max-w-[90vw]">
+    <span id="toastIcon">✨</span>
+    <p id="toastMessage" class="text-xs font-bold"></p>
+</div>
+
+<!-- STREAMING_CHUNK: Integrating customized Javascript logic, onboarding controllers & notification cycles... -->
+<!-- Firebase Libraries integration -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDocs, updateDoc, deleteDoc, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Global Data Definitions
+    let db, auth;
+    let currentUserId = null;
+    let allTasks = []; // Holds current snapshot of tasks
+    let activeDate = new Date().toISOString().split('T')[0]; // Current date pointer
+    let currentMonthOffset = 0; // Relative to current month
+    let firebaseLoadedSuccessfully = false; // Guard safety flag
+    let loadingStartTime = Date.now(); // Clock splash screen duration
+    const minLoadingDuration = 4500; // Prolong loading screen for 4.5 seconds to display tips fully
+
+    // Category Configuration for Theme consistency
+    const categoriesConfig = {
+        Personal: { emoji: "🌸", bg: "bg-rose-50 border-rose-100", text: "text-rose-600" },
+        Work: { emoji: "💼", bg: "bg-indigo-50 border-indigo-100", text: "text-indigo-600" },
+        Study: { emoji: "📚", bg: "bg-amber-50 border-amber-100", text: "text-amber-600" },
+        Health: { emoji: "💪", bg: "bg-emerald-50 border-emerald-100", text: "text-emerald-600" },
+        Finance: { emoji: "💰", bg: "bg-teal-50 border-teal-100", text: "text-teal-600" }
+    };
+
+    // Global app config retrieval from system parameters
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'bloom-planner-app';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+        apiKey: "demo-key",
+        authDomain: "demo-auth",
+        projectId: "demo-project",
+        storageBucket: "demo-bucket",
+        messagingSenderId: "demo-sender",
+        appId: "demo-appid"
+    };
+
+    // Wisdom loading tips from Sumit Biswas
+    const sumitTips = [
+        "Sumit says: Track step-by-step; consistency always beats intensity.",
+        "Sumit says: Sowing a target today reaps a masterpiece tomorrow.",
+        "Sumit says: Habits are the compound interest of self-growth.",
+        "Sumit says: Focus on health and study boards first to stay burning bright.",
+        "Sumit says: Review your weekly layout every Sunday for ultimate clarity."
+    ];
+    let tipIntervalId = null;
+
+    // Stepped Onboarding configurations
+    let currentOnboardingScene = 1;
+
+    // Spotlight Tutorial configurations (Point and Explain)
+    let currentTutorialStep = 0;
+    const tutorialSteps = [
+        {
+            elementId: "tabSelectionBox",
+            title: "Switch Boards 🗓️",
+            text: "This box lets you toggle between Today's Schedule, the Weekly Overview, and your Month Overview."
+        },
+        {
+            elementId: "addTargetBtn",
+            title: "Sow a Target 🌱",
+            text: "Tap this button to create a task. You can assign category emojis and set a specific hourly time slot."
+        },
+        {
+            elementId: "statsSummaryBar",
+            title: "Success Metrics 📈",
+            text: "Observe your real-time completion rates calculated instantly as you check off items on your board."
+        },
+        {
+            elementId: "testAlarmBtn",
+            title: "Sumit's Smart Alarms 🔔",
+            text: "If you leave goals incomplete, Mr. Biswas's background scheduler will remind you periodically!"
+        }
+    ];
+
+    /* STREAMING_CHUNK: Initializing Android-optimized app startup sequence with prolonged loading display... */
+    async function initApp() {
+        startRotatingTips();
+        showStatus('Connecting to Cloud...', 'syncing');
+        
+        // Safety Auto-Timeout: If firebase connection hangs for more than 1.5 seconds,
+        // we forcefully fall back to Local Sandbox Mode so the app starts immediately!
+        const connectionTimeout = setTimeout(() => {
+            if (!firebaseLoadedSuccessfully) {
+                console.warn("Firebase took too long to connect. Initiating local storage sandbox.");
+                showStatus('Offline Sandbox', 'offline');
+                setupSandboxMode();
+            }
+        }, 1500);
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    clearTimeout(connectionTimeout);
+                    firebaseLoadedSuccessfully = true;
+                    currentUserId = user.uid;
+                    document.getElementById('avatarLetter').innerText = user.uid.substring(0,2).toUpperCase();
+                    document.getElementById('userDisplayLabel').innerText = `Sync Key: ${user.uid.substring(0, 8)}...`;
+                    showToast("Connected securely! Sumit's Sync engine active.", "🚀");
+                    showStatus('Sync Enabled', 'connected');
+                    listenToTasks();
+                } else {
+                    showStatus('Disconnected', 'offline');
+                }
+            });
+
+        } catch (error) {
+            clearTimeout(connectionTimeout);
+            console.error("Firebase connection error. Falling back to local offline sandbox mode.", error);
+            showStatus('Offline Sandbox', 'offline');
+            setupSandboxMode();
+        }
+
+        // Onboarding Check
+        checkOnboardingStatus();
+        
+        // Notification permission request & system loop
+        requestNotificationPermission();
+        startNotificationLoop();
+    }
+
+    // Rotating loading tips cycle
+    function startRotatingTips() {
+        let index = 0;
+        tipIntervalId = setInterval(() => {
+            index = (index + 1) % sumitTips.length;
+            const tipEl = document.getElementById('loadingTip');
+            if (tipEl) {
+                // Fade effect on text rotation
+                tipEl.style.opacity = 0;
+                setTimeout(() => {
+                    tipEl.innerText = `"${sumitTips[index]}"`;
+                    tipEl.style.opacity = 1;
+                }, 200);
+            }
+        }, 1300);
+    }
+
+    function stopRotatingTips() {
+        if (tipIntervalId) {
+            clearInterval(tipIntervalId);
+        }
+    }
+
+    /* STREAMING_CHUNK: Setting up multi-scene custom profile wizard... */
+    function checkOnboardingStatus() {
+        const onboardingDone = localStorage.getItem('bloom_onboarding_done');
+        if (!onboardingDone) {
+            const modal = document.getElementById('onboardingModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            updateOnboardingUI();
+        }
+    }
+
+    window.nextOnboardingStep = function() {
+        if (currentOnboardingScene < 4) {
+            document.getElementById(`obScene-${currentOnboardingScene}`).classList.add('hidden');
+            currentOnboardingScene++;
+            document.getElementById(`obScene-${currentOnboardingScene}`).classList.remove('hidden');
+            updateOnboardingUI();
+        }
+    };
+
+    function updateOnboardingUI() {
+        document.getElementById('onboardingProgressLabel').innerText = `Step ${currentOnboardingScene} of 4`;
+        document.getElementById('onboardingProgressBar').style.width = `${(currentOnboardingScene / 4) * 100}%`;
+    }
+
+    window.saveGenderSelection = function(gender) {
+        localStorage.setItem('ob_gender', gender);
+        nextOnboardingStep();
+    };
+
+    window.saveProfessionSelection = function(profession) {
+        localStorage.setItem('ob_profession', profession);
+        nextOnboardingStep();
+    };
+
+    window.saveGoalSelection = function(goal) {
+        localStorage.setItem('ob_goal', goal);
+        localStorage.setItem('bloom_onboarding_done', 'true');
+
+        // Close Modal
+        document.getElementById('onboardingModal').classList.add('hidden');
+        document.getElementById('onboardingModal').classList.remove('flex');
+
+        // Spark confetti
+        confetti({
+            particleCount: 150,
+            spread: 80,
+            origin: { y: 0.6 }
+        });
+
+        showToast(`Setup complete! Sumit Biswas wishes you success! ✨`, "🌸");
+
+        // Instantly trigger spotlight walkthrough
+        startTutorialGuide();
+    };
+
+    /* STREAMING_CHUNK: Activating spotlight tooltip positioning math for tall Android screens... */
+    window.startTutorialGuide = function() {
+        currentTutorialStep = 0;
+        showTourHighlight();
+    };
+
+    function showTourHighlight() {
+        const step = tutorialSteps[currentTutorialStep];
+        const el = document.getElementById(step.elementId);
+
+        if (!el) {
+            nextTutorialStep();
+            return;
+        }
+
+        // Remove highlight from any previous highlighted elements
+        document.querySelectorAll('.tour-highlight').forEach(node => {
+            node.classList.remove('tour-highlight', 'ring-4', 'ring-rose-500', 'ring-offset-2');
+        });
+
+        // Spotlight highlight targeted node
+        el.classList.add('tour-highlight', 'ring-4', 'ring-rose-500', 'ring-offset-2');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Position the card relative to target node
+        const rect = el.getBoundingClientRect();
+        const tooltip = document.getElementById('tourTooltipCard');
+        tooltip.classList.remove('hidden');
+        tooltip.classList.add('flex');
+
+        // Inject content
+        document.getElementById('tourTooltipTitle').innerText = step.title;
+        document.getElementById('tourTooltipText').innerText = step.text;
+
+        // Position math adjusting for page viewport boundaries
+        const scrollY = window.scrollY;
+        const scrollX = window.scrollX;
+        let top = rect.bottom + scrollY + 12;
+        let left = Math.max(12, Math.min(window.innerWidth - 300, rect.left + scrollX));
+
+        if (rect.bottom > window.innerHeight - 150) {
+            top = rect.top + scrollY - 160;
+        }
+
+        tooltip.style.top = `${top}px`;
+        tooltip.style.left = `${left}px`;
+    }
+
+    window.nextTutorialStep = function() {
+        if (currentTutorialStep < tutorialSteps.length - 1) {
+            currentTutorialStep++;
+            showTourHighlight();
+        } else {
+            skipTutorial();
+            showToast("You're ready! Start planning now.", "🏆");
+        }
+    };
+
+    window.skipTutorial = function() {
+        document.querySelectorAll('.tour-highlight').forEach(node => {
+            node.classList.remove('tour-highlight', 'ring-4', 'ring-rose-500', 'ring-offset-2');
+        });
+        document.getElementById('tourTooltipCard').classList.remove('flex');
+        document.getElementById('tourTooltipCard').classList.add('hidden');
+    };
+
+    // Browser local/native notifications module
+    function requestNotificationPermission() {
+        if ("Notification" in window) {
+            if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+        }
+    }
+
+    function startNotificationLoop() {
+        setInterval(() => {
+            checkAndTriggerAlarm();
+        }, 15 * 60 * 1000);
+    }
+
+    function checkAndTriggerAlarm() {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todayTasks = allTasks.filter(t => t.date === todayStr && !t.completed);
+
+        if (todayTasks.length > 0) {
+            const randomTask = todayTasks[Math.floor(Math.random() * todayTasks.length)];
+            
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification("Target Alarm! ⏰", {
+                    body: `Sumit reminds you to complete: "${randomTask.title}" as soon as possible!`,
+                    icon: 'https://placehold.co/192x192/f43f5e/ffffff?text=Bloom'
+                });
+            }
+            showToast(`⏰ Action Alert! Sumit recommends focusing on: "${randomTask.title}"`, "🌸");
+        }
+    }
+
+    // Manual quick alarm trigger for testing
+    window.triggerImmediateAlarm = function() {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const pending = allTasks.filter(t => t.date === todayStr && !t.completed);
+
+        if ("Notification" in window && Notification.permission !== "granted") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    fireMockNotification(pending);
+                } else {
+                    fireInAppAlarmFallback(pending);
+                }
+            });
+        } else {
+            fireMockNotification(pending);
+        }
+    };
+
+    function fireMockNotification(pending) {
+        if (pending.length > 0) {
+            const randomTask = pending[Math.floor(Math.random() * pending.length)];
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification("BloomPlanner Tracker", {
+                    body: `Sumit advises focusing on your goal: "${randomTask.title}"`,
+                    icon: 'https://placehold.co/192x192/f43f5e/ffffff?text=Sumit'
+                });
+            }
+            showToast(`Alarm triggered! Pending target found: "${randomTask.title}"`, "🔔");
+        } else {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification("All Targets Clear! 🎉", {
+                    body: `Great work! Sumit Biswas verified that all of today's targets are completed!`,
+                    icon: 'https://placehold.co/192x192/f43f5e/ffffff?text=Sumit'
+                });
+            }
+            showToast("Clean Slate! Sumit verified all targets completed.", "🏆");
+        }
+    }
+
+    function fireInAppAlarmFallback(pending) {
+        if (pending.length > 0) {
+            const randomTask = pending[Math.floor(Math.random() * pending.length)];
+            showToast(`⏰ Alarm: "${randomTask.title}" requires your attention!`, "🌸");
+        } else {
+            showToast("Sumit Biswas says: Your daily workspace is clean! 🎉", "🏆");
+        }
+    }
+
+    function listenToTasks() {
+        if (!currentUserId) return;
+        
+        const tasksCollectionRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'tasks');
+        
+        onSnapshot(tasksCollectionRef, (snapshot) => {
+            const tasksList = [];
+            snapshot.forEach((doc) => {
+                tasksList.push({ id: doc.id, ...doc.data() });
+            });
+            allTasks = tasksList;
+            
+            updateUI();
+            dismissLoadingOverlay();
+
+        }, (err) => {
+            console.error("Snapshot dynamic fetch failure, loading sandbox fallback: ", err);
+            setupSandboxMode();
+        });
+    }
+
+    // Sandbox Local Storage fallback
+    function setupSandboxMode() {
+        const stored = localStorage.getItem(`bloom_tasks_${appId}`);
+        allTasks = stored ? JSON.parse(stored) : [];
+        updateUI();
+        dismissLoadingOverlay();
+    }
+
+    /* STREAMING_CHUNK: Enforcing prolonged minimum splash screen duration logic... */
+    function dismissLoadingOverlay() {
+        const elapsedTime = Date.now() - loadingStartTime;
+        const remainingTime = Math.max(0, minLoadingDuration - elapsedTime);
+        
+        // Timeout ensures the loading page stays visible for at least 4.5 seconds for branding showcase
+        setTimeout(() => {
+            const loader = document.getElementById('loadingOverlay');
+            if (loader) {
+                stopRotatingTips();
+                loader.classList.add('opacity-0');
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                }, 700);
+            }
+        }, remainingTime);
+    }
+
+    function updateUI() {
+        renderNavigationDate();
+        renderTimeline();
+        renderWeeklyPlanner();
+        renderMonthCalendar();
+        renderProgressStats();
+    }
+
+    function renderNavigationDate() {
+        const dateObj = new Date(activeDate + 'T00:00:00');
+        const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const formattedDay = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+        
+        document.getElementById('navDate').innerText = formattedDate;
+        document.getElementById('navDay').innerText = formattedDay;
+        document.getElementById('todayDateSelector').value = activeDate;
+    }
+
+    function renderTimeline() {
+        const container = document.getElementById('timelineList');
+        container.innerHTML = '';
+
+        const dayTasks = allTasks.filter(t => t.date === activeDate);
+        
+        const total = dayTasks.length;
+        const done = dayTasks.filter(t => t.completed).length;
+        const pending = total - done;
+        const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+        document.getElementById('statTotal').innerText = total;
+        document.getElementById('statDone').innerText = done;
+        document.getElementById('statPending').innerText = pending;
+        document.getElementById('statProgress').innerText = `${percent}%`;
+        document.getElementById('todayProgressPercent').innerText = `${percent}%`;
+
+        if (dayTasks.length === 0) {
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 text-slate-400 text-center">
+                    <span class="text-4xl mb-3">🌱</span>
+                    <p class="text-sm font-bold text-slate-500">No targets planned for today</p>
+                    <p class="text-xs text-slate-400 mt-1">Tap "Add Target" to design your schedule!</p>
+                </div>
+            `;
+            return;
+        }
+
+        const unscheduled = dayTasks.filter(t => !t.startTime);
+        const scheduled = dayTasks.filter(t => t.startTime).sort((a,b) => a.startTime.localeCompare(b.startTime));
+        const sortedTasks = [...unscheduled, ...scheduled];
+
+        sortedTasks.forEach(task => {
+            const config = categoriesConfig[task.category] || categoriesConfig.Personal;
+            const timeTag = task.startTime ? `
+                <span class="bg-white px-2.5 py-1 rounded-xl text-xs font-extrabold text-slate-500 shadow-sm border border-slate-100 flex items-center gap-1">
+                    <i class="fa-regular fa-clock text-[10px]"></i> ${formatTime(task.startTime)} ${task.endTime ? ` - ${formatTime(task.endTime)}` : ''}
+                </span>
+            ` : `
+                <span class="bg-slate-100 text-slate-400 px-2.5 py-1 rounded-xl text-xs font-bold">Unscheduled</span>
+            `;
+
+            const itemHTML = `
+                <div class="group flex items-start gap-4 p-4 rounded-2xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${task.completed ? 'bg-slate-50/70 border-slate-200' : 'bg-white border-slate-100'}">
+                    <div class="pt-0.5">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                            onclick="window.toggleTaskCompleted('${task.id}', ${task.completed})"
+                            class="w-6 h-6 rounded-full text-rose-500 bg-slate-50 border-slate-200/80 focus:ring-rose-500/50 focus:ring-offset-0 cursor-pointer accent-rose-500 transition-all duration-300 scale-105">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <span class="${config.bg} ${config.text} px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider">${config.emoji} ${task.category}</span>
+                            ${timeTag}
+                        </div>
+                        <h4 class="font-bold text-sm tracking-tight text-slate-800 break-words group-hover:text-rose-600 transition-colors ${task.completed ? 'line-through text-slate-400' : ''}">
+                            ${escapeHTML(task.title)}
+                        </h4>
+                        ${task.description ? `<p class="text-xs text-slate-400 mt-1 line-clamp-2">${escapeHTML(task.description)}</p>` : ''}
+                    </div>
+                    <div class="flex gap-1 self-center opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="window.editTaskDirectly('${task.id}')" class="w-8 h-8 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-indigo-600 transition-colors" title="Edit target"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+                        <button onclick="window.deleteTaskDirectly('${task.id}')" class="w-8 h-8 rounded-xl hover:bg-rose-50 flex items-center justify-center text-slate-400 hover:text-rose-600 transition-colors" title="Delete target"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += itemHTML;
+        });
+    }
+
+    function renderWeeklyPlanner() {
+        const grid = document.getElementById('weeklyBoardGrid');
+        grid.innerHTML = '';
+
+        const activeDateObj = new Date(activeDate + 'T00:00:00');
+        const dayOfWeek = activeDateObj.getDay();
+        const startOfWeek = new Date(activeDateObj);
+        startOfWeek.setDate(activeDateObj.getDate() - dayOfWeek);
+
+        for (let i = 0; i < 7; i++) {
+            const currentDay = new Date(startOfWeek);
+            currentDay.setDate(startOfWeek.getDate() + i);
+            const dateStr = currentDay.toISOString().split('T')[0];
+
+            const dayTasks = allTasks.filter(t => t.date === dateStr);
+            const completed = dayTasks.filter(t => t.completed).length;
+            const total = dayTasks.length;
+            const isTodaySelected = (dateStr === activeDate);
+
+            let progressIndicator = '';
+            if (total > 0) {
+                const perc = Math.round((completed / total) * 100);
+                progressIndicator = `
+                    <div class="mt-2 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                        <div class="h-full bg-rose-500 rounded-full" style="width: ${perc}%"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 mt-1">
+                        <span>${completed}/${total} Done</span>
+                        <span>Sumit Tracking</span>
+                    </div>
+                `;
+            } else {
+                progressIndicator = `<p class="text-[10px] text-slate-400 font-semibold mt-2 italic">Unassigned</p>`;
+            }
+
+            const dayName = currentDay.toLocaleDateString('en-US', { weekday: 'short' });
+            const dayNum = currentDay.getDate();
+
+            const colHTML = `
+                <div onclick="window.changeActiveDate('${dateStr}')" class="cursor-pointer bg-white p-4 rounded-2xl border transition-all duration-300 hover:shadow-md hover:-translate-y-1 ${isTodaySelected ? 'border-rose-500 ring-2 ring-rose-500/20 shadow-sm' : 'border-slate-100'} flex flex-col justify-between min-h-[140px]">
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold ${isTodaySelected ? 'text-rose-500' : 'text-slate-400'} uppercase tracking-wider">${dayName}</span>
+                            <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black ${isTodaySelected ? 'bg-rose-500 text-white' : 'bg-slate-50 text-slate-600'}">${dayNum}</span>
+                        </div>
+                        <div class="mt-3 space-y-1.5 max-h-[80px] overflow-y-auto">
+                            ${dayTasks.slice(0, 3).map(task => `
+                                <div class="flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 shrink-0 rounded-full ${task.completed ? 'bg-emerald-400' : 'bg-rose-400'}"></span>
+                                    <span class="text-[11px] font-bold text-slate-600 truncate ${task.completed ? 'line-through text-slate-400' : ''}">${escapeHTML(task.title)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div>
+                        ${progressIndicator}
+                    </div>
+                </div>
+            `;
+            grid.innerHTML += colHTML;
+        }
+    }
+
+    function renderMonthCalendar() {
+        const calendarGrid = document.getElementById('calendarDaysGrid');
+        calendarGrid.innerHTML = '';
+
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth() + currentMonthOffset, 1);
+        const year = firstDayOfMonth.getFullYear();
+        const month = firstDayOfMonth.getMonth();
+
+        const monthLabel = firstDayOfMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        document.getElementById('calendarMonthLabel').innerText = monthLabel;
+
+        const startDayIndex = firstDayOfMonth.getDay();
+        const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < startDayIndex; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = "bg-slate-50/40 rounded-2xl min-h-[75px]";
+            calendarGrid.appendChild(emptyCell);
+        }
+
+        for (let day = 1; day <= totalDaysInMonth; day++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dayTasks = allTasks.filter(t => t.date === dateStr);
+            const total = dayTasks.length;
+            const completed = dayTasks.filter(t => t.completed).length;
+            const isSelected = (dateStr === activeDate);
+
+            let cellStyle = "bg-white hover:bg-slate-50 border-slate-100";
+            let textStyle = "text-slate-700";
+
+            if (isSelected) {
+                cellStyle = "bg-rose-500 hover:bg-rose-600 border-rose-500 text-white shadow-md shadow-rose-500/15";
+                textStyle = "text-white font-extrabold";
+            }
+
+            let dotIndicator = '';
+            if (total > 0) {
+                const rate = completed / total;
+                let dotColor = "bg-rose-400";
+                if (rate === 1) dotColor = "bg-emerald-500";
+                else if (rate >= 0.5) dotColor = "bg-amber-400";
+                
+                dotIndicator = `
+                    <div class="flex items-center gap-1 mt-1 bg-slate-50 ${isSelected ? 'bg-white/20' : ''} px-1.5 py-0.5 rounded-full text-[9px] font-bold">
+                        <span class="w-1.5 h-1.5 rounded-full ${dotColor}"></span>
+                        <span class="${isSelected ? 'text-white' : 'text-slate-600'}">${completed}/${total}</span>
+                    </div>
+                `;
+            }
+
+            const dayCell = document.createElement('div');
+            dayCell.className = `cursor-pointer p-1.5 sm:p-2.5 rounded-2xl border transition-all duration-300 min-h-[75px] flex flex-col justify-between ${cellStyle}`;
+            dayCell.onclick = () => window.changeActiveDate(dateStr);
+            dayCell.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <span class="text-sm font-bold ${textStyle}">${day}</span>
+                </div>
+                ${dotIndicator}
+            `;
+            calendarGrid.appendChild(dayCell);
+        }
+    }
+
+    function renderProgressStats() {
+        const totalAllTime = allTasks.length;
+        const completedAllTime = allTasks.filter(t => t.completed).length;
+        const rate = totalAllTime > 0 ? Math.round((completedAllTime / totalAllTime) * 100) : 0;
+
+        document.getElementById('statAllTimeTotal').innerText = totalAllTime;
+        document.getElementById('statAllTimeCompleted').innerText = completedAllTime;
+        document.getElementById('allTimePercent').innerText = `${rate}%`;
+
+        const circumference = 377;
+        const offset = circumference - (rate / 100) * circumference;
+        document.getElementById('allTimeCircle').style.strokeDashoffset = offset;
+
+        const categories = ["Personal", "Work", "Study", "Health", "Finance"];
+        const categoryContainer = document.getElementById('categoryStatsContainer');
+        categoryContainer.innerHTML = '';
+
+        categories.forEach(cat => {
+            const catTasks = allTasks.filter(t => t.category === cat);
+            const totalCat = catTasks.length;
+            const completedCat = catTasks.filter(t => t.completed).length;
+            const perc = totalCat > 0 ? Math.round((completedCat / totalCat) * 100) : 0;
+            const config = categoriesConfig[cat];
+
+            const barHTML = `
+                <div>
+                    <div class="flex justify-between text-xs font-bold text-slate-600 mb-1">
+                        <span class="flex items-center gap-1.5">${config.emoji} ${cat}</span>
+                        <span>${perc}% (${completedCat}/${totalCat})</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                        <div class="h-full bg-rose-500 rounded-full transition-all duration-1000" style="width: ${perc}%; background-color: ${cat === 'Personal' ? '#fb7185' : cat === 'Work' ? '#6366f1' : cat === 'Study' ? '#f59e0b' : cat === 'Health' ? '#10b981' : '#14b8a6'}"></div>
+                    </div>
+                </div>
+            `;
+            categoryContainer.innerHTML += barHTML;
+        });
+
+        // Compute heat map logic (Last 30 days)
+        const heatmap = document.getElementById('heatmapGrid');
+        heatmap.innerHTML = '';
+        const today = new Date();
+        for (let i = 29; i >= 0; i--) {
+            const targetDay = new Date();
+            targetDay.setDate(today.getDate() - i);
+            const dateStr = targetDay.toISOString().split('T')[0];
+
+            const dayTasks = allTasks.filter(t => t.date === dateStr);
+            const total = dayTasks.length;
+            const completed = dayTasks.filter(t => t.completed).length;
+
+            let levelClass = "bg-slate-100";
+            if (total > 0) {
+                const completionRate = completed / total;
+                if (completionRate === 1) levelClass = "bg-rose-600";
+                else if (completionRate >= 0.5) levelClass = "bg-rose-400";
+                else levelClass = "bg-rose-200";
+            }
+
+            const formattedHeatDay = targetDay.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const heatCell = document.createElement('div');
+            heatCell.className = `w-5 h-5 rounded-md ${levelClass} transition-all duration-300 hover:scale-125 hover:shadow-sm cursor-pointer`;
+            heatCell.title = `${formattedHeatDay}: ${completed}/${total} completed`;
+            heatCell.onclick = () => window.changeActiveDate(dateStr);
+            heatmap.appendChild(heatCell);
+        }
+
+        calculateStreakAndBadges(completedAllTime);
+    }
+
+    function calculateStreakAndBadges(completedAllTime) {
+        let streak = 0;
+        const today = new Date();
+        let checkingDate = new Date(today);
+
+        while (true) {
+            const dateStr = checkingDate.toISOString().split('T')[0];
+            const tasksOnDate = allTasks.filter(t => t.date === dateStr);
+            const anyCompleted = tasksOnDate.some(t => t.completed);
+
+            if (anyCompleted) {
+                streak++;
+                checkingDate.setDate(checkingDate.getDate() - 1);
+            } else {
+                if (dateStr === today.toISOString().split('T')[0]) {
+                    checkingDate.setDate(checkingDate.getDate() - 1);
+                    continue;
+                }
+                break;
+            }
+        }
+
+        const streakEl = document.getElementById('streakCount');
+        if (streakEl) {
+            streakEl.innerText = `${streak} ${streak === 1 ? 'Day' : 'Days'}`;
+        }
+
+        const badges = [
+            { id: 'first_goal', title: 'Sower', desc: 'Sow your first task', icon: '🌱', active: completedAllTime >= 1 },
+            { id: 'streak_3', title: 'Streaker', desc: '3-day execution streak', icon: '🔥', active: streak >= 3 },
+            { id: 'perfect_5', title: 'Champion', desc: '5 completed targets', icon: '🏆', active: completedAllTime >= 5 },
+            { id: 'workaholic', title: 'Focus Guru', desc: '10 finished items', icon: '👑', active: completedAllTime >= 10 }
+        ];
+
+        const activeCount = badges.filter(b => b.active).length;
+        const badgeCountEl = document.getElementById('badgeCount');
+        if (badgeCountEl) {
+            badgeCountEl.innerText = `${activeCount}/${badges.length}`;
+        }
+
+        const badgesGrid = document.getElementById('badgesGrid');
+        if (badgesGrid) {
+            badgesGrid.innerHTML = '';
+            badges.forEach(badge => {
+                const cardHTML = `
+                    <div class="p-2 rounded-2xl flex flex-col items-center justify-center border text-center transition-all ${badge.active ? 'bg-indigo-50/50 border-indigo-100 text-slate-800' : 'bg-slate-50/40 border-slate-100 opacity-40'}" title="${badge.desc}">
+                        <span class="text-xl sm:text-2xl">${badge.icon}</span>
+                        <span class="text-[9px] font-bold mt-1 tracking-tight truncate w-full">${badge.title}</span>
+                    </div>
+                `;
+                badgesGrid.innerHTML += cardHTML;
+            });
+        }
+    }
+
+    window.toggleTaskCompleted = async function(taskId, currentStatus) {
+        const nextStatus = !currentStatus;
+        if (nextStatus) {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#fb7185', '#fda4af', '#f43f5e', '#6366f1', '#10b981']
+            });
+            showToast("Fantastic! Keep going! 🎉", "🌸");
+        }
+
+        if (currentUserId && firebaseLoadedSuccessfully) {
+            showStatus('Updating...', 'syncing');
+            const taskDocRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'tasks', taskId);
+            await updateDoc(taskDocRef, { completed: nextStatus });
+            showStatus('Sync Active', 'connected');
+        } else {
+            const taskIndex = allTasks.findIndex(t => t.id === taskId);
+            if (taskIndex > -1) {
+                allTasks[taskIndex].completed = nextStatus;
+                localStorage.setItem(`bloom_tasks_${appId}`, JSON.stringify(allTasks));
+                updateUI();
+            }
+        }
+    };
+
+    window.saveTaskForm = async function(event) {
+        event.preventDefault();
+        
+        const title = document.getElementById('taskTitle').value.trim();
+        const description = document.getElementById('taskDesc').value.trim();
+        const date = document.getElementById('taskDate').value;
+        const category = document.getElementById('taskCategory').value;
+        const hasTime = document.getElementById('hasTimeToggle').checked;
+        const startTime = hasTime ? document.getElementById('taskStartTime').value : '';
+        const MathEndTime = hasTime ? document.getElementById('taskEndTime').value : '';
+
+        const editId = document.getElementById('editTaskId').value;
+
+        const payload = {
+            title,
+            description,
+            date,
+            category,
+            startTime,
+            endTime: MathEndTime,
+            completed: false,
+            updatedAt: new Date().toISOString()
+        };
+
+        showStatus('Saving...', 'syncing');
+
+        if (currentUserId && firebaseLoadedSuccessfully) {
+            const taskColRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'tasks');
+            if (editId) {
+                const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'tasks', editId);
+                await updateDoc(docRef, payload);
+                showToast("Target successfully updated!", "📝");
+            } else {
+                payload.createdAt = new Date().toISOString();
+                const newDocRef = doc(taskColRef);
+                await setDoc(newDocRef, payload);
+                showToast("New target sown successfully!", "🌱");
+            }
+            showStatus('Sync Active', 'connected');
+        } else {
+            if (editId) {
+                const idx = allTasks.findIndex(t => t.id === editId);
+                if (idx > -1) {
+                    allTasks[idx] = { ...allTasks[idx], ...payload };
+                }
+            } else {
+                payload.id = crypto.randomUUID();
+                payload.createdAt = new Date().toISOString();
+                allTasks.push(payload);
+            }
+            localStorage.setItem(`bloom_tasks_${appId}`, JSON.stringify(allTasks));
+            updateUI();
+            showToast("Saved to browser local memory!", "💾");
+        }
+
+        closeTaskModal();
+    };
+
+    window.editTaskDirectly = function(taskId) {
+        const task = allTasks.find(t => t.id === taskId);
+        if (!task) return;
+
+        document.getElementById('editTaskId').value = task.id;
+        document.getElementById('taskTitle').value = task.title;
+        document.getElementById('taskDesc').value = task.description || '';
+        document.getElementById('taskDate').value = task.date;
+        document.getElementById('taskCategory').value = task.category;
+        
+        if (task.startTime) {
+            document.getElementById('hasTimeToggle').checked = true;
+            document.getElementById('taskStartTime').value = task.startTime;
+            document.getElementById('taskEndTime').value = task.endTime || '';
+            document.getElementById('timeFieldsContainer').classList.remove('hidden');
+        } else {
+            document.getElementById('hasTimeToggle').checked = false;
+            document.getElementById('taskStartTime').value = '';
+            document.getElementById('taskEndTime').value = '';
+            document.getElementById('timeFieldsContainer').classList.add('hidden');
+        }
+
+        document.getElementById('modalTitle').innerText = "Edit Target";
+        document.getElementById('modalIcon').innerText = "📝";
+        
+        const modal = document.getElementById('taskModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    };
+
+    window.deleteTaskDirectly = async function(taskId) {
+        showStatus('Deleting...', 'syncing');
+        if (currentUserId && firebaseLoadedSuccessfully) {
+            const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'tasks', taskId);
+            await deleteDoc(docRef);
+            showToast("Target cleared away.", "🗑️");
+            showStatus('Sync Active', 'connected');
+        } else {
+            allTasks = allTasks.filter(t => t.id !== taskId);
+            localStorage.setItem(`bloom_tasks_${appId}`, JSON.stringify(allTasks));
+            updateUI();
+            showToast("Removed from local space.", "🗑️");
+        }
+    };
+
+    window.changeActiveDate = function(newDateStr) {
+        activeDate = newDateStr;
+        updateUI();
+        switchTab('today');
+    };
+
+    window.shiftMonth = function(direction) {
+        currentMonthOffset += direction;
+        renderMonthCalendar();
+    };
+
+    window.switchTab = function(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.className = "tab-btn flex-1 md:flex-initial flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 text-slate-600 hover:bg-slate-50 whitespace-nowrap";
+        });
+        const activeBtn = document.getElementById(`tabBtn-${tabId}`);
+        if (activeBtn) {
+            let col = 'rose';
+            if (tabId === 'week') col = 'indigo';
+            else if (tabId === 'month') col = 'emerald';
+            else if (tabId === 'stats') col = 'violet';
+
+            activeBtn.className = `tab-btn flex-1 md:flex-initial flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 bg-${col}-500 text-white shadow-md shadow-${col}-500/10 whitespace-nowrap`;
+        }
+
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+        const activeContent = document.getElementById(`tab-${tabId}`);
+        if (activeContent) {
+            activeContent.classList.remove('hidden');
+        }
+    };
+
+    window.openAddTaskModal = function() {
+        document.getElementById('taskForm').reset();
+        document.getElementById('editTaskId').value = '';
+        document.getElementById('taskDate').value = activeDate;
+        document.getElementById('hasTimeToggle').checked = false;
+        document.getElementById('timeFieldsContainer').classList.add('hidden');
+        
+        document.getElementById('modalTitle').innerText = "New Target Details";
+        document.getElementById('modalIcon').innerText = "🌸";
+
+        const modal = document.getElementById('taskModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    };
+
+    window.closeTaskModal = function() {
+        const modal = document.getElementById('taskModal');
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+    };
+
+    window.toggleTimeFields = function() {
+        const checked = document.getElementById('hasTimeToggle').checked;
+        const container = document.getElementById('timeFieldsContainer');
+        if (checked) {
+            container.classList.remove('hidden');
+            const now = new Date();
+            const startHour = String(now.getHours()).padStart(2, '0') + ':00';
+            const endHour = String((now.getHours() + 1) % 24).padStart(2, '0') + ':00';
+            document.getElementById('taskStartTime').value = startHour;
+            document.getElementById('taskEndTime').value = endHour;
+        } else {
+            container.classList.add('hidden');
+        }
+    };
+
+    window.copyUserId = function() {
+        if (!currentUserId) return;
+        const tempTextArea = document.createElement('textarea');
+        tempTextArea.value = currentUserId;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempTextArea);
+        showToast("Personal Workspace ID copied to clipboard!", "🔑");
+    };
+
+    function showToast(message, icon = "✨") {
+        const toast = document.getElementById('toastNotification');
+        document.getElementById('toastIcon').innerText = icon;
+        document.getElementById('toastMessage').innerText = message;
+        
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        setTimeout(() => {
+            toast.classList.add('translate-y-20', 'opacity-0');
+        }, 3500);
+    }
+
+    function showStatus(text, status) {
+        const ind = document.getElementById('cloudStatus');
+        if (!ind) return;
+        let dotColor = 'bg-emerald-400';
+        if (status === 'syncing') dotColor = 'bg-amber-400';
+        if (status === 'offline') dotColor = 'bg-rose-400';
+
+        ind.innerHTML = `<span class="w-2 h-2 rounded-full ${dotColor} animate-pulse"></span> ${text}`;
+    }
+
+    function formatTime(timeStr) {
+        if (!timeStr) return '';
+        const [hourStr, minStr] = timeStr.split(':');
+        const hour = parseInt(hourStr, 10);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const formattedHour = hour % 12 || 12;
+        return `${formattedHour}:${minStr} ${ampm}`;
+    }
+
+    function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag)
+        );
+    }
+
+    window.onload = function() {
+        initApp();
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker Active'))
+                .catch((err) => console.log('Service Worker skipped.', err));
+        }
+    };
+</script>
+</body>
+</html>
